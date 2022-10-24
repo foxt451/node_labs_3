@@ -1,0 +1,28 @@
+name: Lint and Build Code Base
+
+on:
+  push:
+  pull_request:
+    branches: ["main"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install deps
+        run: npm ci
+      - name: Lint codebase with eslint
+        run: npm run eslint:check -- .
+      - name: Lint codebase with prettier
+        run: npm run prettier:check -- .
+      - name: Build with typescript
+        run: npm run build

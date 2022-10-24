@@ -2,7 +2,16 @@
   "env": {
     "node": true
   },
-  "extends": ["metarhia", "plugin:sonarjs/recommended", "prettier"],
+  "extends": [
+    "metarhia",
+    "plugin:sonarjs/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
   "overrides": [],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -10,6 +19,12 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["@typescript-eslint", "sonarjs"],
-  "rules": {}
+  "plugins": ["@typescript-eslint", "sonarjs", "import"],
+  "rules": {},
+  "settings": {
+    "import/resolver": {
+      "typescript": true,
+      "node": true
+    }
+  }
 }

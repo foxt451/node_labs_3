@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "eslint:fix": "eslint --cache --fix",
-    "prettier:fix": "prettier --cache --write",
+    "eslint:fix": "eslint --ignore-path .gitignore --cache --fix",
+    "eslint:check": "eslint --ignore-path .gitignore --cache",
+    "prettier:fix": "prettier --cache --write --ignore-path .gitignore",
+    "prettier:check": "prettier --check --cache --ignore-path .gitignore",
+    "build": "tsc",
     "prepare": "husky install"
   },
   "repository": {
@@ -27,6 +30,7 @@
     "eslint": "^8.25.0",
     "eslint-config-metarhia": "^8.1.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-sonarjs": "^0.16.0",
     "husky": "^8.0.1",
