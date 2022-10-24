@@ -2,8 +2,13 @@ name: Lint and Build Code Base
 
 on:
   push:
+    branches: ["main"]
   pull_request:
     branches: ["main"]
+# cancel in-progress runs on new commits to same PR (gitub.event.number)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
