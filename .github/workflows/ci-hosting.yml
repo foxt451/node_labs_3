@@ -1,10 +1,14 @@
-name: Lint and Build Code Base
+name: Lint and Build Hosting Code Base
 
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "functions/**/*"
   pull_request:
     branches: ["main"]
+    paths-ignore:
+      - "functions/**/*"
 # cancel in-progress runs on new commits to same PR (gitub.event.number)
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -23,11 +27,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install deps
-        run: npm ci
+      - name: Install root deps
+        run: npm ci --ignore-scripts
       - name: Lint codebase with eslint
-        run: npm run eslint:check -- .
+        run: npm run eslint:check -- hosting/
       - name: Lint codebase with prettier
-        run: npm run prettier:check -- .
+        run: npm run prettier:check -- hosting/
       - name: Build with typescript
-        run: npm run build
+        run: cd hosting && npm run build
