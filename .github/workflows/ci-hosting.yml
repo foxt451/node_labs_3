@@ -29,10 +29,8 @@ jobs:
           cache: "npm"
       - name: Install root deps
         run: npm ci --ignore-scripts
-      - run: cd hosting
       - name: Install hosting deps
-        run: npm ci --ignore-scripts
-      - run: cd ..
+        run: cd hosting && npm ci --ignore-scripts && cd ..
       - name: Lint codebase with eslint
         run: npm run eslint:check -- hosting/
       - name: Lint codebase with prettier
