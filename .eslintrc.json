@@ -3,10 +3,10 @@
     "node": true
   },
   "extends": [
-    "metarhia",
     "plugin:sonarjs/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "metarhia",
     "plugin:@typescript-eslint/strict",
     "plugin:import/recommended",
     "plugin:import/typescript",
