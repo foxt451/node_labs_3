@@ -9,6 +9,7 @@
   "private": true,
   "scripts": {
     "start": "wrangler dev",
+    "build": "tsc",
     "deploy": "wrangler publish"
   }
 }

@@ -20,11 +20,7 @@
 // }
 
 export default {
-  fetch(
-    request: Request,
-    env: unknown,
-    ctx: ExecutionContext
-  ): Promise<Response> {
+  fetch(): Promise<Response> {
     return Promise.resolve(new Response("Hello World!"));
   },
 };
