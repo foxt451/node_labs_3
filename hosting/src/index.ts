@@ -7,7 +7,7 @@ const requestListener: RequestListener = (req, res) => {
 
 const server = http.createServer(requestListener);
 const PORT = process.env.PORT ?? 8080;
-console.log(a);
+console.log(as);
 
 server.listen(PORT);
 console.log(`Server listening on port ${PORT}`);
