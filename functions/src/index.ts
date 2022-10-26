@@ -21,6 +21,6 @@
 
 export default {
   fetch(): Promise<Response> {
-    return Promise.resolve(new Response("Hello World!"));
+    return Promise.resolve(new Response("Hello, World!"));
   },
 };
