@@ -1,0 +1,11 @@
+# env files
+.env
+
+# deps
+node_modules
+
+# ts build files
+build
+
+# linters
+.eslintcache

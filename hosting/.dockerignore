@@ -1,0 +1,9 @@
+Dockerfile
+.dockerignore
+node_modules
+build
+.git
+.gitignore
+README.md
+.husky
+fly.toml

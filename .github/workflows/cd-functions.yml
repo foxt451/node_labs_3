@@ -1,0 +1,24 @@
+name: Continuous delivery for Functions Code Base
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    # run for root and functions
+    paths-ignore:
+      - "hosting/**/*"
+# cancel in-progress runs on new commits to same PR (gitub.event.number)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          workingDirectory: 'functions'

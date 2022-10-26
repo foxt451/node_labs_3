@@ -1,0 +1,35 @@
+name: CI for Hosting Code Base
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "functions/**/*"
+# cancel in-progress runs on new commits to same PR (gitub.event.number)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install root deps
+        run: npm ci --ignore-scripts
+      - name: Install functions deps
+        run: cd functions && npm ci --ignore-scripts && cd ..
+      - name: Lint codebase with eslint
+        run: npm run eslint:check -- functions/
+      - name: Lint codebase with prettier
+        run: npm run prettier:check -- functions/
+      - name: Build with typescript
+        run: cd functions && npm run build
