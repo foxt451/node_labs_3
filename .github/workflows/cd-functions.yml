@@ -7,10 +7,6 @@ on:
     # run for root and functions
     paths-ignore:
       - "hosting/**/*"
-  pull_request:
-    branches: ["main"]
-    paths-ignore:
-      - "hosting/**/*"
 # cancel in-progress runs on new commits to same PR (gitub.event.number)
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
