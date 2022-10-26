@@ -38,6 +38,6 @@
       "npm run eslint:fix --",
       "npm run prettier:fix --"
     ],
-    "*.{css,md}": "npm run prettier:fix --"
+    "*.{css,md,json}": "npm run prettier:fix --"
   }
 }

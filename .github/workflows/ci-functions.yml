@@ -1,11 +1,6 @@
-name: CI/CD for Functions Code Base
+name: CI for Functions Code Base
 
 on:
-  push:
-    branches: ["main"]
-    # run for root and hosting
-    paths-ignore:
-      - "hosting/**/*"
   pull_request:
     branches: ["main"]
     paths-ignore:

@@ -1,11 +1,6 @@
 name: CI/CD for Hosting Code Base
 
 on:
-  push:
-    branches: ["main"]
-    # run for root and hosting
-    paths-ignore:
-      - "functions/**/*"
   pull_request:
     branches: ["main"]
     paths-ignore:
