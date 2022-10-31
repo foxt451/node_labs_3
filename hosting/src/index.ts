@@ -1,5 +1,5 @@
 import http, { RequestListener } from "http";
-console.log(a);
+console.log(as);
 
 const requestListener: RequestListener = (req, res) => {
   res.writeHead(200);
