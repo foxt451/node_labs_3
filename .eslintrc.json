@@ -4,9 +4,9 @@
   },
   "extends": [
     "plugin:sonarjs/recommended",
+    "metarhia",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "metarhia",
     "plugin:@typescript-eslint/strict",
     "plugin:import/recommended",
     "plugin:import/typescript",
@@ -19,7 +19,13 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "sonarjs", "import"],
-  "rules": {},
+  "rules": {
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      { "ignoreTypeReferences": true }
+    ]
+  },
   "ignorePatterns": [".eslintrc.js"],
   "settings": {
     "import/resolver": {

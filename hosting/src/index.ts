@@ -1,12 +1,17 @@
-import http, { RequestListener } from "http";
+import bodyParser from "body-parser";
+import morgan from "morgan";
+import { MyServer } from "./my-server";
+import { postsApp } from "./routes/posts";
+import { testApp } from "./routes/test";
 
-const requestListener: RequestListener = (req, res) => {
-  res.writeHead(200);
-  res.end("Hello, Mom!!!");
-};
+const server = new MyServer();
 
-const server = http.createServer(requestListener);
+server.useWare(morgan("common"));
+server.useWare(bodyParser.json());
+server.useWare("/posts", postsApp);
+server.useWare("/test", testApp);
+
 const PORT = process.env.PORT ?? 8080;
-
-server.listen(PORT);
-console.log(`Server listening on port ${PORT}`);
+server.listen(Number(PORT), undefined, undefined, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
