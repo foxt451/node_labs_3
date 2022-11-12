@@ -21,8 +21,6 @@ export type JsonApiHandler<
 
 export const jsonApi: JsonApiHandler = (_, res, next) => {
   res.jsonApi = async (data) => {
-    console.log(data);
-
     const serialized = await serializers[data.type].serialize(data.payload);
     res.end(JSON.stringify(serialized));
   };
