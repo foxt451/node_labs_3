@@ -1,23 +1,30 @@
 import { postsRepository } from "../data/posts";
-import { FunctionHandler, BodyFunctionHandler } from "../my-server";
+import { JsonApiHandler } from "../middleware/json-api";
+import { FunctionHandler, BodyRequest } from "../my-server";
 import { AddPostPayload } from "../types/posts";
 
-export const getAllPosts: FunctionHandler = async (req, res): Promise<void> => {
+export const getAllPosts: JsonApiHandler = async (req, res): Promise<void> => {
   const posts = await postsRepository.getAllPosts();
   res.writeHead(200);
-  res.end(JSON.stringify(posts));
+  void res.jsonApi({
+    type: "post",
+    payload: posts,
+  });
 };
 
-export const addPost: BodyFunctionHandler<AddPostPayload> = async (
+export const addPost: JsonApiHandler<BodyRequest<AddPostPayload>> = async (
   req,
   res
 ): Promise<void> => {
   const newPost = await postsRepository.addPost(req.body);
   res.writeHead(201);
-  res.end(JSON.stringify(newPost));
+  void res.jsonApi({
+    type: "post",
+    payload: newPost,
+  });
 };
 
-export const getSinglePost: FunctionHandler = async (
+export const getSinglePost: JsonApiHandler = async (
   req,
   res
 ): Promise<void> => {
@@ -28,7 +35,10 @@ export const getSinglePost: FunctionHandler = async (
     res.end("Post with such id was not found");
   } else {
     res.writeHead(200);
-    res.end(JSON.stringify(post));
+    void res.jsonApi({
+      type: "post",
+      payload: post,
+    });
   }
 };
 

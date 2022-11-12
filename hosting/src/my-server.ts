@@ -36,7 +36,7 @@ interface RequestBloat {
 type RequestBuilder = IncomingMessage & Partial<RequestBloat>;
 export type Request = IncomingMessage & RequestBloat;
 
-type BodyRequest<T> = Request & {
+export type BodyRequest<T> = Request & {
   body: T;
 };
 
@@ -90,7 +90,7 @@ export class MyServer {
   public useWare<
     R extends Request = Request,
     S extends ServerResponse = ServerResponse
-  >(base: string | Handler, ...handlers: Handler<R, S>[]) {
+  >(base: string | Handler<R, S>, ...handlers: Handler<R, S>[]) {
     if (base === "" || base === "/") {
       this.globalMiddlewares.push(...(handlers as FunctionHandler[]));
     } else if (typeof base !== "string") {
