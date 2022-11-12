@@ -1,6 +1,6 @@
 import { parse } from "regexparam";
 
-type Handler = (...args: unknown[]) => void;
+type Handler = (...args: never[]) => void;
 
 interface Route {
   pattern: RegExp;

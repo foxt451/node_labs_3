@@ -1,5 +1,5 @@
 import { postsRepository } from "../data/posts";
-import { FunctionHandler, JsonFunctionHandler } from "../my-server";
+import { FunctionHandler, BodyFunctionHandler } from "../my-server";
 import { AddPostPayload } from "../types/posts";
 
 export const getAllPosts: FunctionHandler = async (req, res): Promise<void> => {
@@ -8,7 +8,7 @@ export const getAllPosts: FunctionHandler = async (req, res): Promise<void> => {
   res.end(JSON.stringify(posts));
 };
 
-export const addPost: JsonFunctionHandler<AddPostPayload> = async (
+export const addPost: BodyFunctionHandler<AddPostPayload> = async (
   req,
   res
 ): Promise<void> => {

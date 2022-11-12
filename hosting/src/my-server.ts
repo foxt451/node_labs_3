@@ -2,22 +2,30 @@ import http, { Server, IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { MyRouter, RequestParams } from "./my-router";
 
-type ErrorHandler = (err: unknown, req: Request, res: ServerResponse) => void;
+type ErrorHandler<
+  R extends Request = Request,
+  S extends ServerResponse = ServerResponse
+> = (err: unknown, req: R, res: S) => void;
 
-interface ServerOptions {
+interface ServerOptions<
+  R extends Request = Request,
+  S extends ServerResponse = ServerResponse
+> {
   server?: Server;
-  onError?: ErrorHandler;
+  onError?: ErrorHandler<R, S>;
   // only makes sense for the top application
   onShutdown?: () => void;
 }
 
-export type FunctionHandler<R = Request, S = ServerResponse> = (
-  req: R,
-  res: S,
-  next: (error?: unknown) => void
-) => void | Promise<void>;
+export type FunctionHandler<
+  R extends Request = Request,
+  S extends ServerResponse = ServerResponse
+> = (req: R, res: S, next: (error?: unknown) => void) => void | Promise<void>;
 type SubApp = MyServer;
-type Handler = SubApp | FunctionHandler;
+type Handler<
+  R extends Request = Request,
+  S extends ServerResponse = ServerResponse
+> = SubApp | FunctionHandler<R, S>;
 
 interface RequestBloat {
   originalUrl: string;
@@ -26,13 +34,17 @@ interface RequestBloat {
   search: string;
 }
 type RequestBuilder = IncomingMessage & Partial<RequestBloat>;
-type Request = IncomingMessage & RequestBloat;
+export type Request = IncomingMessage & RequestBloat;
 
-type JsonRequest<T> = Request & {
+type BodyRequest<T> = Request & {
   body: T;
 };
 
-export type JsonFunctionHandler<T> = FunctionHandler<JsonRequest<T>>;
+export type BodyFunctionHandler<
+  T,
+  R extends BodyRequest<T> = BodyRequest<T>,
+  S extends ServerResponse = ServerResponse
+> = FunctionHandler<R, S>;
 
 const defaultOnError: ErrorHandler = (err, req, res) => {
   if (typeof err === "string" || Buffer.isBuffer(err)) {
@@ -45,6 +57,11 @@ const defaultOnError: ErrorHandler = (err, req, res) => {
   }
 };
 
+const HTTP_REFRESH = {
+  "Content-Type": "text/html",
+  Refresh: "5",
+};
+
 export class MyServer {
   private globalMiddlewares: FunctionHandler[] = [];
   private apps: Partial<Record<string, SubApp>> = {};
@@ -55,6 +72,7 @@ export class MyServer {
   private connections = new Map<Socket, ServerResponse>();
   private onShutdown?: () => void;
   private isShuttingDown?: boolean = false;
+  private readonly SHUTDOWN_TIMEOUT_MS = 5000;
 
   constructor(options: ServerOptions = {}) {
     this.onError = options.onError ?? defaultOnError;
@@ -62,15 +80,17 @@ export class MyServer {
     this.onShutdown = options.onShutdown;
   }
 
-  public addHandler<R = Request, S = ServerResponse>(
-    method: string,
-    path: string,
-    ...handlers: FunctionHandler<R, S>[]
-  ): void {
-    this.router.add(method, path, handlers as (() => void)[]);
+  public addHandler<
+    R extends Request = Request,
+    S extends ServerResponse = ServerResponse
+  >(method: string, path: string, ...handlers: FunctionHandler<R, S>[]): void {
+    this.router.add(method, path, handlers);
   }
 
-  public useWare(base: string | Handler, ...handlers: Handler[]) {
+  public useWare<
+    R extends Request = Request,
+    S extends ServerResponse = ServerResponse
+  >(base: string | Handler, ...handlers: Handler<R, S>[]) {
     if (base === "" || base === "/") {
       this.globalMiddlewares.push(...(handlers as FunctionHandler[]));
     } else if (typeof base !== "string") {
@@ -84,7 +104,9 @@ export class MyServer {
           this.apps[base] = handler;
         } else {
           const arr = this.basedMiddleware[base];
-          this.basedMiddleware[base] = arr ? [...arr, handler] : [handler];
+          this.basedMiddleware[base] = (
+            arr ? [...arr, handler] : [handler]
+          ) as FunctionHandler[];
         }
       }
     }
@@ -127,7 +149,7 @@ export class MyServer {
     const app = this.apps[base];
     if (requestMatch.handlers.length > 0) {
       req.params = requestMatch.params;
-      handlers = requestMatch.handlers;
+      handlers = requestMatch.handlers as FunctionHandler[];
     } else if (app) {
       MyServer.removeBaseFromReq(base, req);
       handlers.push(app.handler.bind(app, req, res));
@@ -161,16 +183,16 @@ export class MyServer {
       "request",
       (req, res) => {
         if (res.socket) {
-          console.log("New req");
+          console.log("New request");
           this.connections.set(res.socket, res);
         }
         this.handler(req, res);
       }
     );
     this.server.on("connection", (connection) => {
-      console.log("New conn");
+      console.log("New connection");
       connection.on("close", () => {
-        console.log("Close conn");
+        console.log("Closed connection");
         this.connections.delete(connection);
       });
     });
@@ -187,8 +209,6 @@ export class MyServer {
         this.showConnections();
         this.onShutdown?.();
         console.log("Bye");
-        // resume default behaviour of exiting process
-        process.exit();
       });
     });
     this.server.listen(port, hostname, backlog, listeningListener);
@@ -205,6 +225,7 @@ export class MyServer {
   private closeConnections() {
     for (const [connection, res] of this.connections.entries()) {
       this.connections.delete(connection);
+      res.writeHead(503, HTTP_REFRESH);
       res.end("Server stopped");
       connection.destroy();
     }
@@ -217,7 +238,12 @@ export class MyServer {
         process.exit(1);
       }
       callback();
+      // resume default behaviour of exiting process
+      process.exit();
     });
-    this.closeConnections();
+    // give hanging requests some time to finish
+    setTimeout(() => {
+      this.closeConnections();
+    }, this.SHUTDOWN_TIMEOUT_MS);
   }
 }
