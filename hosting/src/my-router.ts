@@ -44,28 +44,23 @@ export class MyRouter {
   public find(path: string, method: string): RequestMatchResult {
     const handlers: Handler[] = [];
     const params: RequestParams = {};
-    for (const route of this.routes) {
-      if (!MyRouter.matchMethods(route.method, method)) {
-        continue;
-      }
-      const matches = route.pattern.exec(path);
-      if (matches === null) {
-        continue;
-      }
-      handlers.push(...route.handlers);
-      if (route.keys.length > 0) {
-        for (let i = 0; i < route.keys.length; i++) {
-          params[route.keys[i]] = matches[i + 1];
+    this.routes
+      .filter((route) => route.method === "" || route.method === method)
+      .filter((route) => route.pattern.test(path))
+      .forEach((route) => {
+        // use this object later
+        const matches = route.pattern.exec(path);
+        if (matches === null) {
+          return;
         }
-      }
-    }
+        handlers.push(...route.handlers);
+        if (route.keys.length === 0) {
+          return;
+        }
+        route.keys.forEach((key, i) => {
+          params[key] = matches[i + 1];
+        });
+      });
     return { handlers, params };
-  }
-
-  private static matchMethods(
-    routeMethod: string,
-    requestMethod: string
-  ): boolean {
-    return routeMethod === "" || requestMethod === routeMethod;
   }
 }

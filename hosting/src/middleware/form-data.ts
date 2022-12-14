@@ -1,16 +1,16 @@
+import { BadRequestError } from "@/errors";
+import { NextFunction, Request } from "@/types/server";
 import formidable from "formidable";
-import { BodyFunctionHandler, FunctionHandler, Request } from "../my-server";
 
-const form = formidable();
+const form = formidable({
+  uploadDir: "/tmp",
+  keepExtensions: false,
+});
 
-type FormdataAttach = Request & {
-  body?: formidable.Fields;
-};
-
-export const formdata: FunctionHandler = (
-  req: FormdataAttach,
-  res,
-  next
+export const formdata = (
+  req: Request,
+  _: unknown,
+  next: NextFunction
 ): void => {
   if (!req.headers["content-type"]?.startsWith("multipart/form-data")) {
     next();
@@ -18,13 +18,10 @@ export const formdata: FunctionHandler = (
   }
   form.parse(req, (err, fields) => {
     if (err) {
-      next(err);
+      next(new BadRequestError("Failed to parse form data"));
       return;
     }
     req.body = fields;
     next();
   });
 };
-
-export type FormdataHandler<T extends formidable.Fields = formidable.Fields> =
-  BodyFunctionHandler<T>;
