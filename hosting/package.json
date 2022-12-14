@@ -32,6 +32,7 @@
     "formidable": "^2.0.1",
     "morgan": "^1.10.0",
     "regexparam": "^2.0.1",
-    "ts-japi": "^1.8.0"
+    "ts-japi": "^1.8.0",
+    "yup": "^0.32.11"
   }
 }
