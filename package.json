@@ -39,8 +39,5 @@
       "npm run prettier:fix --"
     ],
     "*.{css,md,json}": "npm run prettier:fix --"
-  },
-  "dependencies": {
-    "yup": "^0.32.11"
   }
 }
