@@ -1,5 +1,5 @@
 import { ServerResponse } from "http";
-import { Serializer } from "ts-japi";
+import { ErrorSerializer, Serializer } from "ts-japi";
 import { PostSerializer } from "@/data/posts/post-serializer";
 import { CustomError } from "@/errors";
 
@@ -17,7 +17,7 @@ export const jsonApi = async (
   res.end(JSON.stringify(serialized));
 };
 
-const serializeError = (error: unknown) => {
+const standardizeError = (error: unknown) => {
   if (error instanceof CustomError) {
     return {
       status: error.status.toString(),
@@ -30,6 +30,13 @@ const serializeError = (error: unknown) => {
   };
 };
 
+const errorSerializer = new ErrorSerializer({
+  attributes: {
+    status: "status",
+    detail: "detail",
+  },
+});
+
 export const errorJsonApi = (
   res: ServerResponse,
   errors: unknown[],
@@ -39,8 +46,6 @@ export const errorJsonApi = (
 ): void => {
   res.writeHead(commonStatus);
   res.end(
-    JSON.stringify({
-      errors: errors.map(serializeError),
-    })
+    JSON.stringify(errorSerializer.serialize(errors.map(standardizeError)))
   );
 };

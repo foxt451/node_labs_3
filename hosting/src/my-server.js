@@ -3,7 +3,7 @@ import { MyRouter } from "@/my-router";
 import { errorJsonApi } from "./helpers/json-api";
 
 const defaultOnError = (err, _, res) => {
-  errorJsonApi(res, err);
+  errorJsonApi(res, [err]);
 };
 
 const HTTP_REFRESH = {
@@ -23,7 +23,7 @@ export class MyServer {
   isShuttingDown;
   SHUTDOWN_TIMEOUT_MS = 5000;
 
-  constructor(options) {
+  constructor(options = {}) {
     this.onError = options.onError ?? defaultOnError;
     this.server = options.server;
     this.onShutdown = options.onShutdown;
